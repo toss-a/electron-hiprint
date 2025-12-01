@@ -363,11 +363,17 @@ function initServeEvent(server) {
      * @description: client 获取打印机纸张信息
      */
     socket.on("getPaperSizeInfo", (printer) => {
-      console.log(`插件端 ${socket.id}: getPaperSizeInfo`);
+      console.log(`插件端 ${socket.id}: getPaperSizeInfo, printer: ${printer || 'all'}`);
       if (process.platform === "win32") {
-        let fun = printer ? getPaperSizeInfo : getPaperSizeInfoAll;
-        let paper = fun();
-        paper && socket.emit("paperSizeInfo", paper);
+        try {
+          let paper = printer ? getPaperSizeInfo(printer) : getPaperSizeInfoAll();
+          socket.emit("paperSizeInfo", paper || []);
+        } catch (error) {
+          console.error(`获取纸张信息失败: ${error.message}`);
+          socket.emit("paperSizeInfo", []);
+        }
+      } else {
+        socket.emit("paperSizeInfo", []);
       }
     });
 
