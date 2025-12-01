@@ -366,14 +366,22 @@ function initServeEvent(server) {
       console.log(`插件端 ${socket.id}: getPaperSizeInfo, printer: ${printer || 'all'}`);
       if (process.platform === "win32") {
         try {
+          // 手动构建 paper-size-info.exe 的路径，绕过库内部的 asar 路径检测问题
+          const path = require("path");
+          let paperSizeInfoPath = path.join(__dirname, "../node_modules/win32-pdf-printer/paper-size-info.exe");
+          // 如果在 asar 包中，替换为 unpacked 路径
+          if (paperSizeInfoPath.includes("app.asar")) {
+            paperSizeInfoPath = paperSizeInfoPath.replace("app.asar", "app.asar.unpacked");
+          }
+          console.log(`paper-size-info.exe 路径: ${paperSizeInfoPath}`);
+
           let paper;
           if (printer) {
-            // getPaperSizeInfo 需要传递对象 { printer: '打印机名称' }
             console.log(`调用 getPaperSizeInfo({ printer: '${printer}' })`);
-            paper = getPaperSizeInfo({ printer });
+            paper = getPaperSizeInfo({ printer, paperSizeInfoPath });
           } else {
             console.log(`调用 getPaperSizeInfoAll()`);
-            paper = getPaperSizeInfoAll();
+            paper = getPaperSizeInfoAll({ paperSizeInfoPath });
           }
           console.log(`纸张信息结果:`, JSON.stringify(paper).substring(0, 500));
           socket.emit("paperSizeInfo", paper || []);
