@@ -366,7 +366,8 @@ function initServeEvent(server) {
       console.log(`插件端 ${socket.id}: getPaperSizeInfo, printer: ${printer || 'all'}`);
       if (process.platform === "win32") {
         try {
-          let paper = printer ? getPaperSizeInfo(printer) : getPaperSizeInfoAll();
+          // getPaperSizeInfo 需要传递对象 { printer: '打印机名称' }
+          let paper = printer ? getPaperSizeInfo({ printer }) : getPaperSizeInfoAll();
           socket.emit("paperSizeInfo", paper || []);
         } catch (error) {
           console.error(`获取纸张信息失败: ${error.message}`);
