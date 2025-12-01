@@ -1,6 +1,6 @@
 {
   "name": "electron-hiprint",
-  "version": "1.0.14-beta8",
+  "version": "1.0.14-beta9",
   "description": "vue-plugin-hiprint client",
   "main": "main.js",
   "author": "CcSimple<840054486@qq.com>",
@@ -31,6 +31,10 @@
       "output": "out"
     },
     "asar": true,
+    "asarUnpack": [
+      "node_modules/win32-pdf-printer/**/*",
+      "node_modules/pdf-to-printer/**/*"
+    ],
     "files": [
       "**/*"
     ],

@@ -366,14 +366,24 @@ function initServeEvent(server) {
       console.log(`插件端 ${socket.id}: getPaperSizeInfo, printer: ${printer || 'all'}`);
       if (process.platform === "win32") {
         try {
-          // getPaperSizeInfo 需要传递对象 { printer: '打印机名称' }
-          let paper = printer ? getPaperSizeInfo({ printer }) : getPaperSizeInfoAll();
+          let paper;
+          if (printer) {
+            // getPaperSizeInfo 需要传递对象 { printer: '打印机名称' }
+            console.log(`调用 getPaperSizeInfo({ printer: '${printer}' })`);
+            paper = getPaperSizeInfo({ printer });
+          } else {
+            console.log(`调用 getPaperSizeInfoAll()`);
+            paper = getPaperSizeInfoAll();
+          }
+          console.log(`纸张信息结果:`, JSON.stringify(paper).substring(0, 500));
           socket.emit("paperSizeInfo", paper || []);
         } catch (error) {
           console.error(`获取纸张信息失败: ${error.message}`);
+          console.error(error.stack);
           socket.emit("paperSizeInfo", []);
         }
       } else {
+        console.log(`非 Windows 系统，返回空数组`);
         socket.emit("paperSizeInfo", []);
       }
     });
